@@ -9,14 +9,16 @@ import classes from './Puzzle.css';
 class Puzzle extends Component {
     state = {
         moves: 0,
-        rows: 3,
-        columns: 3,
-        selectedPieces: [],
-        colors: [BLUE, RED, BLUE, GREEN, RED, GREEN, GREEN, BLUE, RED],
-        pieces: []
+        rows: 3, //This defines how many rows has the puzzle.
+        columns: 3, //This defines how many columns has the puzzle.
+        selectedPieces: [], //This array is being used to save te pieces that are selected.
+        colors: [BLUE, RED, BLUE, GREEN, RED, GREEN, GREEN, BLUE, RED], //This array contains the default set of colors for a 3x3 puzzle.
+        pieces: [] //This array contains all the pieces of the puzzle.
     }
 
     componentDidMount() {
+        /*This function initialize the puzzle with the corresponding pieces. 
+        If the puzzle has more than 9 pieces, the colors are set randomly.*/
         let pieces = [];
         const rows = this.state.rows;
         const columns = this.state.columns;
@@ -35,6 +37,7 @@ class Puzzle extends Component {
     }
 
     markPiece = (key) => {
+        //This function is responsible for marking a piece with black border when it is selected.
         const style = { ...this.state.pieces[key].props.style, borderColor: 'black' }
         let pieces = [...this.state.pieces];
         let piecePosition = this.getPiecePosition(pieces, key);
@@ -51,6 +54,7 @@ class Puzzle extends Component {
     }
 
     getPiecePosition = (pieces, key) => {
+        //This function return the piece position in the array of pieces which is defined above in the state.
         for(let i=0; i<pieces.length; i++) {
             if(parseInt(pieces[i].key, 10) === key){
                 return i;
@@ -59,6 +63,7 @@ class Puzzle extends Component {
     }
 
     setBackgroundToPieces = (backgroundColor, selectedPieces) => {
+        //This function sets the new background color for the pieces that were selected.
         let pieces = [...this.state.pieces];
         pieces = this.setBackgroundToPiece(pieces, backgroundColor, selectedPieces[0]);
         pieces = this.setBackgroundToPiece(pieces, backgroundColor, selectedPieces[1]);
@@ -85,18 +90,19 @@ class Puzzle extends Component {
     }
 
     pieceSelected = (key) => {
+        //This function runs when a pieces is being selected.
         const pieceStyle = this.state.pieces[key].props.style
         if(pieceStyle.backgroundColor !== WHITE) {
-            let updatedPieces = this.markPiece(key);
+            let updatedPieces = this.markPiece(key); //This set the border to black.
             let updatedSelectedPieces = [...this.state.selectedPieces];
-            updatedSelectedPieces.push(key);
+            updatedSelectedPieces.push(key); //This saves the key of the current piece.
     
             this.setState({ ...this.sate, selectedPieces: updatedSelectedPieces, pieces: updatedPieces }, () => {
-                if(this.state.selectedPieces.length === 2) {
-                    const backgroundColor = this.calculateBackgroundColor(this.state.selectedPieces);
-                    let updatedPieces = this.setBackgroundToPieces(backgroundColor, this.state.selectedPieces);
+                if(this.state.selectedPieces.length === 2) { //It enters to the if, if the there are 2 pieces selected.
+                    const backgroundColor = this.calculateBackgroundColor(this.state.selectedPieces); //This function calculates the new background color (first piece + second piece)
+                    let updatedPieces = this.setBackgroundToPieces(backgroundColor, this.state.selectedPieces); //This function sets the new background color to the pieces.
                     let moves = this.state.moves;
-                    if(this.state.selectedPieces[0] !== this.state.selectedPieces[1]) {
+                    if(this.state.selectedPieces[0] !== this.state.selectedPieces[1]) { //If the same piece is being clicked twice, it will not increments the moves.
                         moves = moves + 1;
                     }
                     this.setState({...this.state, moves: moves, selectedPieces: [], pieces: updatedPieces});
@@ -106,6 +112,7 @@ class Puzzle extends Component {
     }
 
     calculateBackgroundColor = (selectedPieces) => {
+        //This function calculates the new background color for the pices that are selected.
         const firstColor = this.state.pieces[selectedPieces[0]].props.style.backgroundColor;
         const secondColor = this.state.pieces[selectedPieces[1]].props.style.backgroundColor;
         let combinatedColor = null;
@@ -136,11 +143,11 @@ class Puzzle extends Component {
         let table = (
             rows.map(row => {
                 return (
-                    <div style={{display: 'table-row'}}>
+                    <div className={classes.TableRow}>
                         {columns.map(col => {
                             count += 1;
                             return(
-                                <div style={{display: 'table-cell'}}>
+                                <div className={classes.TableCell}>
                                     {this.state.pieces[count]}
                                 </div>
                             );
@@ -151,7 +158,7 @@ class Puzzle extends Component {
         );
         return (
             <div className={classes.Puzzle}>
-                <div style={{display: 'table'}}>
+                <div className={classes.Table}>
                     {table}
                 </div>
                 <div className={classes.Reference}>
